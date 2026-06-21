@@ -27,9 +27,10 @@ void append_reading_to_file(GString *out, Reading *reading)
     while (g_hash_table_iter_next(&iter, &key, &value)) {
         guint64 pixel = *(guint64 *)key;
         TraceBin *bin = value;
-        g_string_append_printf(out, "%" G_GUINT64_FORMAT " %.9f %u\n",
+        g_string_append_printf(out, "%" G_GUINT64_FORMAT " %.9f %.9f %u\n",
                                pixel,
-                               bin->sum_db,
+                               bin->sum_power,
+                               bin->peak_power,
                                bin->count);
     }
     g_string_append(out, "END\n");

@@ -2,11 +2,16 @@
 
 #include <math.h>
 
+static const double RTLSDR_SAMPLE_RATES[] = {1.024, 1.8, 2.048, 2.4, 2.56, 2.88, 3.2};
+static const double HACKRF_SAMPLE_RATES[] = {2.0, 2.5, 4.0, 5.0, 8.0, 10.0, 12.5, 16.0, 20.0};
+static const double MIRISDR_SAMPLE_RATES[] = {2.048, 2.4, 3.2, 4.0, 6.0, 8.0, 10.0};
+static const double CUSTOM_SAMPLE_RATES[] = {0.25, 0.5, 1.0, 1.024, 1.8, 2.0, 2.048, 2.4, 2.5, 2.56, 2.88, 3.2, 4.0, 5.0, 6.0, 8.0, 10.0, 12.5, 16.0, 20.0};
+
 const DevicePreset PRESETS[] = {
-    {"RTL-SDR", "driver=rtlsdr", 24.0, 1766.0, 0.25, 3.2, 2.4, 0.0, 50.0, 35.0},
-    {"HackRF One", "driver=hackrf", 1.0, 6000.0, 2.0, 20.0, 10.0, 0.0, 76.0, 32.0},
-    {"Mirics/SDRplay", "driver=miri", 0.15, 1900.0, 0.25, 10.0, 2.4, 0.0, 50.0, 35.0},
-    {"SoapySDR personalizado", "", 24.0, 1766.0, 0.25, 20.0, 2.4, 0.0, 80.0, 35.0},
+    {"RTL-SDR", "driver=rtlsdr", 24.0, 1766.0, 1.024, 3.2, 2.4, RTLSDR_SAMPLE_RATES, G_N_ELEMENTS(RTLSDR_SAMPLE_RATES), 0.0, 50.0, 35.0},
+    {"HackRF One", "driver=hackrf", 1.0, 6000.0, 2.0, 20.0, 10.0, HACKRF_SAMPLE_RATES, G_N_ELEMENTS(HACKRF_SAMPLE_RATES), 0.0, 76.0, 32.0},
+    {"Mirics/SDRplay", "driver=miri", 0.15, 1900.0, 2.048, 10.0, 2.4, MIRISDR_SAMPLE_RATES, G_N_ELEMENTS(MIRISDR_SAMPLE_RATES), 0.0, 50.0, 35.0},
+    {"SoapySDR personalizado", "", 24.0, 1766.0, 0.25, 20.0, 2.4, CUSTOM_SAMPLE_RATES, G_N_ELEMENTS(CUSTOM_SAMPLE_RATES), 0.0, 80.0, 35.0},
 };
 
 const guint PRESETS_LEN = G_N_ELEMENTS(PRESETS);
@@ -88,7 +93,7 @@ gboolean get_reading_bin_db(Reading *reading, guint64 pixel, double *db)
         return FALSE;
     }
 
-    *db = bin->sum_db / bin->count;
+    *db = 10.0 * log10((bin->peak_power > 0.0 ? bin->peak_power : bin->sum_power / bin->count) + 1e-20);
     return TRUE;
 }
 

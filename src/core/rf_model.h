@@ -10,8 +10,14 @@
 #define PNG_EXPORT_WIDTH 23040
 #define GRAPH_HEIGHT 720
 #define FFT_SIZE 4096
+#define FFTS_PER_STEP 3
+#define TUNE_SETTLE_US 120000
+#define DISCARD_SECONDS_AFTER_TUNE 0.20
+#define FFT_STEP_FRACTION 0.50
+#define FFT_USABLE_FRACTION 1.00
+#define FFT_DC_NOTCH_BINS 8
 #define DEFAULT_DB_MIN -120.0
-#define DEFAULT_DB_MAX -20.0
+#define DEFAULT_DB_MAX 0.0
 
 typedef struct {
     float r;
@@ -19,7 +25,8 @@ typedef struct {
 } Complex;
 
 typedef struct {
-    double sum_db;
+    double sum_power;
+    double peak_power;
     guint count;
 } TraceBin;
 
@@ -45,6 +52,8 @@ typedef struct {
     double sample_rate_min_msps;
     double sample_rate_max_msps;
     double sample_rate_msps;
+    const double *sample_rates_msps;
+    guint sample_rates_len;
     double gain_min_db;
     double gain_max_db;
     double gain_db;
